@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teacher Login - SSS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #eef5ff;
+        }
+
+        .box {
+            max-width: 420px;
+            margin: 60px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,.12);
+        }
+
+        h1 {
+            color: #0759b8;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0 15px;
+            box-sizing: border-box;
+            border: 1px solid #ccd6e0;
+            border-radius: 8px;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background: #0759b8;
+            color: white;
+            border: 0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .error {
+            color: #b00020;
+        }
+
+        a {
+            color: #0759b8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h1>Teacher Login</h1>
+    <p>Shinshicho Sinary Secondary School</p>
+
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST">
+
+        <label>Username</label>
+        <input type="text" name="username" required>
+
+        <label>Password</label>
+        <input type="password" name="password" required>
+
+        <button type="submit">Sign in securely</button>
+
+    </form>
+
+    <p>
+        New teacher?
+        <a href="/teacher/register">Register here</a>
+    </p>
+
+    <p>
+        <a href="/">← Back to school home</a>
+    </p>
+</div>
+
+</body>
+</html>

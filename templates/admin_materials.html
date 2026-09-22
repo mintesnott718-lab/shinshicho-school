@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Learning Materials - SSS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #eef6ff;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #0759a5;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 11px;
+            margin: 7px 0 15px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+        }
+
+        button {
+            background: #0759a5;
+            color: white;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        .material {
+            border-top: 1px solid #ddd;
+            padding: 15px 0;
+        }
+
+        .delete {
+            background: #c62828;
+        }
+
+        a {
+            color: #0759a5;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1>📚 Learning Materials</h1>
+
+    <div class="card">
+        <h2>Upload Material</h2>
+
+        <form method="POST"
+              action="{{ url_for('admin_materials') }}"
+              enctype="multipart/form-data">
+
+            <label>Title</label>
+            <input type="text" name="title" required>
+
+            <label>Description</label>
+            <textarea name="description" rows="4"></textarea>
+
+            <label>Material Type</label>
+            <select name="material_type" required>
+                <option value="">Select type</option>
+                <option value="Notes">Notes</option>
+                <option value="Assignment">Assignment</option>
+                <option value="Worksheet">Worksheet</option>
+                <option value="Exam">Exam</option>
+                <option value="Tutorial">Tutorial</option>
+            </select>
+
+            <label>Grade</label>
+            <select name="grade" required>
+                <option value="">Select grade</option>
+                <option value="9">Grade 9</option>
+                <option value="10">Grade 10</option>
+                <option value="11">Grade 11</option>
+                <option value="12">Grade 12</option>
+            </select>
+
+            <label>File</label>
+            <input type="file" name="file">
+
+            <button type="submit">Upload Material</button>
+        </form>
+    </div>
+
+
+    <div class="card">
+        <h2>Uploaded Materials</h2>
+
+        {% if materials %}
+
+            {% for material in materials %}
+
+                <div class="material">
+                    <h3>{{ material["title"] }}</h3>
+
+                    <p>
+                        <strong>Type:</strong>
+                        {{ material["material_type"] }}
+                    </p>
+
+                    <p>
+                        <strong>Grade:</strong>
+                        {{ material["grade"] }}
+                    </p>
+
+                    {% if material["description"] %}
+                        <p>{{ material["description"] }}</p>
+                    {% endif %}
+
+                    {% if material["file_name"] %}
+                        <p>
+                            📎
+                            <a href="{{ url_for('uploads', filename=material['file_name']) }}"
+                               target="_blank">
+                                Open File
+                            </a>
+                        </p>
+                    {% endif %}
+
+                    <form method="POST"
+                          action="{{ url_for('admin_delete_material', material_id=material['id']) }}">
+                        <button class="delete" type="submit">
+                            Delete
+                        </button>
+                    </form>
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+            <p>No learning materials uploaded yet.</p>
+        {% endif %}
+
+    </div>
+
+    <p>
+        <a href="{{ url_for('admin_dashboard') }}">← Back to Admin Dashboard</a>
+    </p>
+
+</div>
+</body>
+</html>

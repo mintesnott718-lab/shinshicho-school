@@ -1,0 +1,8 @@
+venv/
+__pycache__/
+*.pyc
+.gunicorn/
+.env
+school.db
+school_backup.db
+static/uploads/

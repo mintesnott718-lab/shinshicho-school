@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teacher Management - SSS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #eef5ff;
+        }
+
+        header {
+            background: #0759b8;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 25px auto;
+            padding: 15px;
+        }
+
+        .card {
+            background: white;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,.08);
+        }
+
+        button {
+            padding: 9px 14px;
+            border: 0;
+            border-radius: 7px;
+            color: white;
+            background: #08752b;
+        }
+
+        .reject {
+            background: #b00020;
+        }
+
+        .pending {
+            color: #c77700;
+            font-weight: bold;
+        }
+
+        .approved {
+            color: #08752b;
+            font-weight: bold;
+        }
+
+        .rejected {
+            color: #b00020;
+            font-weight: bold;
+        }
+
+        a {
+            color: #0759b8;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>SSS Admin</h1>
+    <p>Teacher Management</p>
+</header>
+
+<div class="container">
+
+    <p>
+        <a href="/admin">← Back to Admin Dashboard</a>
+    </p>
+
+    {% if teachers %}
+
+        {% for teacher in teachers %}
+
+        <div class="card">
+
+            <h2>{{ teacher["full_name"] }}</h2>
+
+            <p><strong>Username:</strong> {{ teacher["username"] }}</p>
+            <p><strong>Subject:</strong> {{ teacher["subject"] }}</p>
+            <p><strong>Phone:</strong> {{ teacher["phone"] or "Not provided" }}</p>
+
+            <p>
+                <strong>Status:</strong>
+
+                {% if teacher["status"] == "pending" %}
+                    <span class="pending">Pending</span>
+                {% elif teacher["status"] == "approved" %}
+                    <span class="approved">Approved</span>
+                {% else %}
+                    <span class="rejected">Rejected</span>
+                {% endif %}
+            </p>
+
+            {% if teacher["status"] == "pending" %}
+
+                <form method="POST"
+                      action="/admin/teachers/{{ teacher['id'] }}/approve"
+                      style="display:inline">
+
+                    <button type="submit">
+                        Approve Teacher
+                    </button>
+
+                </form>
+
+                <form method="POST"
+                      action="/admin/teachers/{{ teacher['id'] }}/reject"
+                      style="display:inline">
+
+                    <button type="submit" class="reject">
+                        Reject
+                    </button>
+
+                </form>
+
+            {% endif %}
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="card">
+            <p>No teachers have registered yet.</p>
+        </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>

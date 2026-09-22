@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teacher Dashboard - SSS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #eef5ff;
+        }
+
+        header {
+            background: #0759b8;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 25px auto;
+            padding: 15px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,.08);
+        }
+
+        a {
+            color: #0759b8;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Teacher Dashboard</h1>
+    <p>Welcome, {{ teacher["full_name"] }}</p>
+</header>
+
+<div class="container">
+
+    <div class="card">
+        <h2>Teacher Information</h2>
+        <p><strong>Subject:</strong> {{ teacher["subject"] }}</p>
+        <p><strong>Username:</strong> {{ teacher["username"] }}</p>
+    </div>
+
+    <div class="card">
+        <h2>My Classes</h2>
+
+        {% if classes %}
+
+            {% for class in classes %}
+                <p>
+                    <strong>{{ class["name"] }}</strong>
+                    — Grade {{ class["grade"] }}
+                </p>
+            {% endfor %}
+
+        {% else %}
+
+            <p>No classes have been assigned yet.</p>
+
+        {% endif %}
+    </div>
+
+    <p>
+        <a href="/teacher/logout">Sign out</a>
+    </p>
+
+</div>
+
+</body>
+</html>
