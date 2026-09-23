@@ -22,11 +22,6 @@ ALLOWED_FILES = {
     "doc", "docx", "ppt", "pptx"
 }
 
-
-# =========================
-# DATABASE
-# =========================
-
 def get_db():
     conn = sqlite3.connect(DB)
     conn.row_factory = sqlite3.Row
@@ -170,7 +165,224 @@ def admin_required(func):
 
     return wrapper
 
+# =========================
+# ADMIN LIVE CLASSES
+# =========================
 
+@app.route("/admin/live-classes", methods=["GET", "POST"])
+@admin_required
+def admin_live_classes():
+
+    conn = get_db()
+
+    if request.method == "POST":
+
+        title = request.form.get("title", "").strip()
+        description = request.form.get("description", "").strip()
+        grade = request.form.get("grade", "").strip()
+        meeting_link = request.form.get("meeting_link", "").strip()
+        start_time = request.form.get("start_time", "").strip()
+
+        if title and grade:
+            conn.execute("""
+                INSERT INTO live_classes
+                (title, description, grade, meeting_link, start_time)
+                VALUES (?, ?, ?, ?, ?)
+            """, (
+                title,
+                description,
+                int(grade),
+                meeting_link,
+                start_time
+            ))
+
+            conn.commit()
+
+    live_classes = conn.execute("""
+        SELECT *
+        FROM live_classes
+        ORDER BY start_time ASC
+    """).fetchall()
+
+    conn.close()
+
+    return render_template_string("""
+<!doctype html>
+
+<html>
+
+<head>
+
+<meta name="viewport"
+content="width=device-width,initial-scale=1">
+
+<title>Live Classes</title>
+
+<style>
+
+body {
+    margin:0;
+    background:#050d18;
+    color:white;
+    font-family:Arial,sans-serif;
+}
+
+.container {
+    max-width:900px;
+    margin:auto;
+    padding:30px 20px;
+}
+
+.card {
+    background:#10233a;
+    padding:20px;
+    border-radius:14px;
+    margin-bottom:20px;
+}
+
+input,
+textarea,
+select {
+    width:100%;
+    box-sizing:border-box;
+    padding:12px;
+    margin:8px 0;
+    border-radius:8px;
+    border:1px solid #31506f;
+    background:#07111f;
+    color:white;
+}
+
+button {
+    padding:12px 18px;
+    border:0;
+    border-radius:8px;
+    background:#0878ff;
+    color:white;
+    font-weight:bold;
+}
+
+.class-item {
+    background:#0b1c31;
+    padding:15px;
+    border-radius:10px;
+    margin-top:12px;
+}
+
+a {
+    color:#55aaff;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🎥 Live Classes</h1>
+
+<div class="card">
+
+<h2>Create Live Class</h2>
+
+<form method="POST">
+
+<input
+name="title"
+placeholder="Class title"
+required
+>
+
+<textarea
+name="description"
+placeholder="Class description"
+rows="3"
+></textarea>
+
+<select name="grade" required>
+
+<option value="">Select Grade</option>
+<option value="9">Grade 9</option>
+<option value="10">Grade 10</option>
+<option value="11">Grade 11</option>
+<option value="12">Grade 12</option>
+
+</select>
+
+<input
+name="meeting_link"
+placeholder="Live class meeting link"
+>
+
+<input
+type="datetime-local"
+name="start_time"
+>
+
+<button type="submit">
+Create Live Class
+</button>
+
+</form>
+
+</div>
+
+<div class="card">
+
+<h2>Existing Live Classes</h2>
+
+{% for live in live_classes %}
+
+<div class="class-item">
+
+<h3>{{ live["title"] }}</h3>
+
+<p>
+📚 Grade {{ live["grade"] }}
+</p>
+
+<p>
+{{ live["description"] or "" }}
+</p>
+
+{% if live["start_time"] %}
+<p>
+🕐 {{ live["start_time"] }}
+</p>
+{% endif %}
+
+{% if live["meeting_link"] %}
+
+<p>
+<a href="{{ live["meeting_link"] }}" target="_blank">
+Join Live Class
+</a>
+</p>
+
+{% endif %}
+
+</div>
+
+{% else %}
+
+<p>No live classes scheduled.</p>
+
+{% endfor %}
+
+</div>
+
+<p>
+<a href="/admin">← Back to Admin Dashboard</a>
+</p>
+
+</div>
+
+</body>
+
+</html>
+""", live_classes=live_classes)
 def student_required(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
