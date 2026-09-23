@@ -2128,16 +2128,13 @@ def teacher_register():
         db.execute(
             """
             INSERT INTO teachers
-            (full_name, username, password, password_hash, phone, subject, status)
-            VALUES (?, ?, ?, ?, ?, ?, 'pending')
+            (full_name, username, password, status)
+            VALUES (?, ?, ?, 'pending')
             """,
             (
                 full_name,
                 username,
-                password_hash,
-                password_hash,
-                phone,
-                subject
+                password_hash
             )
         )
 
@@ -2165,7 +2162,7 @@ def teacher_login():
         ).fetchone()
 
         if teacher and check_password_hash(
-            teacher["password_hash"],
+            teacher["password"],
             password
         ):
             if teacher["status"] != "approved":
