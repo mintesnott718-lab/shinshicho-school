@@ -1,0 +1,35 @@
+body {
+    transition: background 0.3s, color 0.3s;
+}
+
+.theme-button {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 9999;
+    padding: 10px 15px;
+    border: 0;
+    border-radius: 8px;
+    background: #0878ff;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+body.light {
+    background: #f4f7fb !important;
+    color: #172033 !important;
+}
+
+body.light .container,
+body.light .card,
+body.light .action,
+body.light .announcement {
+    color: #172033;
+}
+
+body.light .announcement,
+body.light .card,
+body.light .action {
+    background: white;
+}

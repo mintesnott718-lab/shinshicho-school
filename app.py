@@ -35,7 +35,14 @@ def get_db():
 
 def init_db():
     conn = get_db()
-
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS announcements (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            content TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS admins (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -196,6 +203,8 @@ def home():
 <head>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Shinshicho Sinary Secondary School</title>
+<link rel="stylesheet" href="/static/theme.css">
+<script src="/static/theme.js"></script>
 <style>
 body {
     margin:0;
@@ -255,10 +264,11 @@ a.secondary {
 <h1>Shinshicho Sinary Secondary School</h1>
 
 <p>Student Learning & School Management System</p>
-
+<button class="theme-button" onclick="toggleDarkMode()">🌙 Dark Mode</button>
 <div class="buttons">
 <a href="/register">Student Registration</a>
 <a href="/student/login">Student Login</a>
+<a href="/announcements">📢 Announcements</a>
 <a href="/teacher/login">Teacher Login</a>
 <a class="secondary" href="/admin/login">Admin Login</a>
 </div>
@@ -274,7 +284,134 @@ a.secondary {
 # =========================
 # STUDENT REGISTRATION
 # =========================
+@app.route("/announcements")
+def announcements():
 
+    conn = get_db()
+
+    announcements = conn.execute(
+        "SELECT * FROM announcements ORDER BY created_at DESC"
+    ).fetchall()
+
+    conn.close()
+
+    return render_template_string("""
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+python -m py_compile app.py
+<title>School Announcements</title>
+<link rel="stylesheet" href="/static/theme.css">
+<script src="/static/theme.js"></script>
+<style>
+body {
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#07111f;
+    color:white;
+}
+
+.container {
+    max-width:800px;
+    margin:auto;
+    padding:30px 20px;
+}
+
+h1 {
+    color:#55aaff;
+}
+
+.announcement {
+    background:#102238;
+    padding:18px;
+    margin:15px 0;
+    border-radius:12px;
+}
+
+.date {body.light {
+    background:#f4f7fb;
+    color:#172033;
+}
+
+body.light h1 {
+    color:#0878ff;
+}
+
+body.light .announcement {
+    background:white;
+    color:#172033;
+}
+
+body.light .date {
+    color:#667085;
+}
+    color:#8fa8c2;
+    font-size:13px;
+}
+
+a {
+    color:#55aaff;
+}body.light {
+    background:#f4f7fb;
+    color:#172033;
+}
+
+body.light h1 {
+    color:#0878ff;
+}
+
+body.light .announcement {
+    background:white;
+    color:#172033;
+}
+
+body.light .date {
+    color:#667085;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>📢 School Announcements</h1>
+<button class="theme-button" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+
+{% for announcement in announcements %}
+
+<div class="announcement">
+
+<h2>{{ announcement["title"] }}</h2>
+
+<p>{{ announcement["content"] }}</p>
+
+<p class="date">
+{{ announcement["created_at"] }}
+</p>
+
+</div>
+
+{% else %}
+
+<p>No announcements yet.</p>
+
+{% endfor %}
+
+<p>
+<a href="/">← Back to Home</a>
+</p>
+
+</div>
+<script>
+function toggleDarkMode() {
+    document.body.classList.toggle("light");
+}
+</script>
+</body>
+</html>
+""", announcements=announcements)
 @app.route("/register", methods=["GET", "POST"])
 def register():
 
@@ -351,7 +488,12 @@ def register():
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Student Registration</title>
 <style>
-body {
+body {.theme-button {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1000;
+}
     background:#07111f;
     color:white;
     font-family:Arial;
@@ -859,7 +1001,109 @@ def admin_logout():
 # =========================
 # ADMIN DASHBOARD
 # =========================
+@app.route("/admin/announcements", methods=["GET", "POST"])
+@admin_required
+def admin_announcements():
+    conn = get_db()
 
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        content = request.form.get("content", "").strip()
+
+        if title and content:
+            conn.execute(
+                "INSERT INTO announcements (title, content) VALUES (?, ?)",
+                (title, content)
+            )
+            conn.commit()
+
+    announcements = conn.execute(
+        "SELECT * FROM announcements ORDER BY created_at DESC"
+    ).fetchall()
+
+    conn.close()
+
+    return render_template_string("""
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Announcements</title>
+<style>
+body {
+    font-family:Arial,sans-serif;
+    background:#07111f;
+    color:white;
+    padding:20px;
+}
+.container {
+    max-width:800px;
+    margin:auto;
+}
+input, textarea {
+    width:100%;
+    padding:12px;
+    margin:8px 0;
+    box-sizing:border-box;
+    border-radius:8px;
+    border:1px solid #29425f;
+    background:#102238;
+    color:white;
+}
+button {
+    padding:12px 18px;
+    border:0;
+    border-radius:8px;
+    background:#0878ff;
+    color:white;
+    font-weight:bold;
+}
+.announcement {
+    background:#102238;
+    padding:18px;
+    margin-top:15px;
+    border-radius:10px;
+}
+a {
+    color:#55aaff;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>School Announcements</h1>
+
+<form method="POST">
+    <input name="title" placeholder="Announcement title" required>
+
+    <textarea name="content"
+              rows="5"
+              placeholder="Write your announcement..."
+              required></textarea>
+
+    <button type="submit">Publish Announcement</button>
+</form>
+
+<hr>
+
+{% for announcement in announcements %}
+<div class="announcement">
+    <h2>{{ announcement["title"] }}</h2>
+    <p>{{ announcement["content"] }}</p>
+    <small>{{ announcement["created_at"] }}</small>
+</div>
+{% else %}
+<p>No announcements yet.</p>
+{% endfor %}
+
+<p><a href="/admin">← Back to Admin Dashboard</a></p>
+
+</div>
+</body>
+</html>
+""", announcements=announcements)
 @app.route("/admin")
 @admin_required
 def admin_dashboard():
@@ -1108,7 +1352,19 @@ Manage Students
 </a>
 
 </div>
+<div class="action">
 
+<h3>Announcements</h3>
+
+<p>
+Create and publish school announcements.
+</p>
+
+<a class="button" href="/admin/announcements">
+📢 Announcements
+</a>
+
+</div>
 
 <div class="action">
 
