@@ -486,6 +486,7 @@ a.secondary {
 </div>
 
 <p>Grades 9 • 10 • 11 • 12</p>
+<p class="developer">Developed by Mintesnot Tesfaye Leimengo</p>
 
 </div>
 </body>
